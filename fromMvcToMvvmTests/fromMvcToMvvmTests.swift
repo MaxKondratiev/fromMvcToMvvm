@@ -10,17 +10,41 @@ import XCTest
 
 class fromMvcToMvvmTests: XCTestCase {
 
+    private var sut: UserViewModel!
+    private var userService: MockUserService!
+    private var viewOutput: MockUserViewModelOutput!
+    
     override func setUpWithError() throws {
         
+        
+        sut = UserViewModel(userService: userService)
+        viewOutput = MockUserViewModelOutput()
+        userService =  MockUserService()
+        sut.outputDelegate = viewOutput
     }
 
     override func tearDownWithError() throws {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
+        sut = nil
+        userService = nil
+        try super.setUpWithError()
     }
 
-    func testExample() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
+    func testUpdateView_onApiSuccess_showImageAndEmail() throws {
+        //given
+        let user = User(id: 1, email: "me@gmail.com", avatar: "https://www.picsum.com/2")
+        userService.fetchUserMockResult = .success(user)
+        
+        //when
+        sut.fetchUser()
+        
+        //then
+        //XCTAssertEqual(<#T##expression1: Equatable##Equatable#>, <#T##expression2: Equatable##Equatable#>)
+       
+    }
+    
+    func testUpdateView_onApiFailure_showsError() throws {
+        
     }
 
     func testPerformanceExample() throws {
@@ -30,4 +54,23 @@ class fromMvcToMvvmTests: XCTestCase {
         }
     }
 
+}
+class MockUserService: UserService {
+    
+    var fetchUserMockResult:  Result<User, Error>?
+    func fetchUser(completion: @escaping (Result<User, Error>) -> Void) {
+        if let result = fetchUserMockResult {
+            completion(result)
+        }
+    }
+}
+
+class MockUserViewModelOutput: UserViewModelOutput {
+    
+    var updateViewArray: [(imageUrl: String, email: String)] = []
+    func updateView(imageUrl: String, email: String) {
+        updateViewArray.append((imageUrl,email))
+    }
+    
+    
 }
