@@ -16,7 +16,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
       
         guard let scene = (scene as? UIWindowScene) else { return }
         window = UIWindow(windowScene: scene)
-        let viewModel = UserViewModel()
+        let userService : UserService = APIManager()
+        let viewModel = UserViewModel(userService: userService)
         window?.rootViewController = UserViewController(viewModel: viewModel)
         window?.makeKeyAndVisible()
     }

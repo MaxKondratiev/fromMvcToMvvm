@@ -9,6 +9,25 @@ import UIKit
 
 class UserViewModel {
     
+    private let userService: UserService
+    
+    //DInj
+    init(userService: UserService) {
+        self.userService = userService
+    }
+    
+    func fetchUser() {
+        userService.fetchUser { (result) in
+            switch result {
+            
+            case .success(let user):
+                
+            case .failure(_):
+                
+            }
+        }
+    }
+    
 }
 
 class UserViewController: UIViewController {
@@ -69,22 +88,22 @@ class UserViewController: UIViewController {
     
     
       private func fetchUsers() {
-        APIManager.shared.fetchUser { result in
-          switch result {
-          case .success(let user):
-            guard let url = URL(string: user.avatar) else {return}
-            let imageData = try! NSData(contentsOf: url) as Data
-            self.imageView.image = UIImage(data: imageData)
-            self.emailLabel.text = user.email
-          case .failure:
-           guard let errorImageUrl = URL(string: "https://user-images.githubusercontent.com/24848110/33519396-7e56363c-d79d-11e7-969b-09782f5ccbab.png")
-           else {return}
-            let imageData = try! NSData(contentsOf: errorImageUrl) as Data
-            self.imageView.image = UIImage(data: imageData)
-            self.emailLabel.text = "No user found"
-          }
-        }
-      }
+//        APIManager.shared.fetchUser { result in
+//          switch result {
+//          case .success(let user):
+//            guard let url = URL(string: user.avatar) else {return}
+//            let imageData = try! NSData(contentsOf: url) as Data
+//            self.imageView.image = UIImage(data: imageData)
+//            self.emailLabel.text = user.email
+//          case .failure:
+//           guard let errorImageUrl = URL(string: "https://user-images.githubusercontent.com/24848110/33519396-7e56363c-d79d-11e7-969b-09782f5ccbab.png")
+//           else {return}
+//            let imageData = try! NSData(contentsOf: errorImageUrl) as Data
+//            self.imageView.image = UIImage(data: imageData)
+//            self.emailLabel.text = "No user found"
+//          }
+//        }
+//      }
     }
 
 
@@ -93,8 +112,9 @@ protocol UserService  {
 }
 
 class APIManager : UserService {
-      static let shared = APIManager()
-      private init() {}
+    
+      //static let shared = APIManager()
+      //private init() {}
       
       func fetchUser(completion: @escaping (Result<User, Error>) -> Void) {
         
@@ -111,6 +131,10 @@ class APIManager : UserService {
           }
         }.resume()
       }
+    
+    func fetchPosts() {
+        
+    }
     }
 
     struct UserResponse: Decodable {
