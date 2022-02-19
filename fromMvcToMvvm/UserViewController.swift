@@ -13,7 +13,7 @@ protocol UserViewModelOutput: AnyObject {
 
 class UserViewModel {
     
-    weak var output: UserViewModelOutput?
+    weak var outputDelegate: UserViewModelOutput?
     
     private let userService: UserService
     
@@ -27,12 +27,12 @@ class UserViewModel {
             switch result {
             
             case .success(let user):
-                self?.output?.updateView(imageUrl: user.avatar, email: user.email)
+                self?.outputDelegate?.updateView(imageUrl: user.avatar, email: user.email)
                 
                 
             case .failure(_):
                 let errorImageUrl =  "https://user-images.githubusercontent.com/24848110/33519396-7e56363c-d79d-11e7-969b-09782f5ccbab.png"
-                self?.output?.updateView(imageUrl: errorImageUrl, email: "no user found ")
+                self?.outputDelegate?.updateView(imageUrl: errorImageUrl, email: "no user found ")
                 
             }
         }
@@ -41,7 +41,11 @@ class UserViewModel {
 }
 
 
-class UserViewController: UIViewController {
+
+
+class UserViewController: UIViewController, UserViewModelOutput {
+    
+    
 
     // MARK:  Constants
     
@@ -50,6 +54,7 @@ class UserViewController: UIViewController {
     init(viewModel: UserViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
+        self.viewModel.outputDelegate = self
     }
     
     
@@ -99,23 +104,21 @@ class UserViewController: UIViewController {
     
     
       private func fetchUsers() {
-//        APIManager.shared.fetchUser { result in
-//          switch result {
-//          case .success(let user):
-//            guard let url = URL(string: user.avatar) else {return}
-//            let imageData = try! NSData(contentsOf: url) as Data
-//            self.imageView.image = UIImage(data: imageData)
-//            self.emailLabel.text = user.email
-//          case .failure:
-//           guard let errorImageUrl = URL(string: "https://user-images.githubusercontent.com/24848110/33519396-7e56363c-d79d-11e7-969b-09782f5ccbab.png")
-//           else {return}
-//            let imageData = try! NSData(contentsOf: errorImageUrl) as Data
-//            self.imageView.image = UIImage(data: imageData)
-//            self.emailLabel.text = "No user found"
-//          }
-//        }
-//      }
+        viewModel.fetchUser()
     }
+    
+    
+    // MARK:  UserViewModelOutput methods realisation:
+    
+    func updateView(imageUrl: String, email: String) {
+        
+        guard let url = URL(string: imageUrl) else {return}
+        let imageData = try! NSData(contentsOf: url) as Data
+        self.imageView.image = UIImage(data: imageData)
+        self.emailLabel.text = email
+        
+    }
+    
 }
 
 
