@@ -66,7 +66,8 @@ class UserViewController: UIViewController {
           emailLabel.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 4)
         ])
       }
-      
+    
+    
       private func fetchUsers() {
         APIManager.shared.fetchUser { result in
           switch result {
@@ -86,7 +87,12 @@ class UserViewController: UIViewController {
       }
     }
 
-    class APIManager {
+
+protocol UserService  {
+    func fetchUser(completion: @escaping (Result<User, Error>) -> Void)
+}
+
+class APIManager : UserService {
       static let shared = APIManager()
       private init() {}
       
