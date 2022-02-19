@@ -16,10 +16,10 @@ class fromMvcToMvvmTests: XCTestCase {
     
     override func setUpWithError() throws {
         
-        
-        sut = UserViewModel(userService: userService)
         viewOutput = MockUserViewModelOutput()
         userService =  MockUserService()
+        
+        sut = UserViewModel(userService: userService)
         sut.outputDelegate = viewOutput
     }
 
@@ -39,21 +39,25 @@ class fromMvcToMvvmTests: XCTestCase {
         sut.fetchUser()
         
         //then
-        //XCTAssertEqual(<#T##expression1: Equatable##Equatable#>, <#T##expression2: Equatable##Equatable#>)
+        XCTAssertEqual(viewOutput.updateViewArray.count, 1)
+        XCTAssertEqual(viewOutput.updateViewArray[0].email, "me@gmail.com")
+        XCTAssertEqual(viewOutput.updateViewArray[0].imageUrl, "https://www.picsum.com/2")
        
     }
     
     func testUpdateView_onApiFailure_showsError() throws {
         
+        //given
+        userService.fetchUserMockResult = .failure(NSError())
+        
+        //when
+        sut.fetchUser()
+        //then
+        XCTAssertEqual(viewOutput.updateViewArray.count, 1)
+        XCTAssertEqual(viewOutput.updateViewArray[0].email, "no user found ")
+        XCTAssertEqual(viewOutput.updateViewArray[0].imageUrl, "https://user-images.githubusercontent.com/24848110/33519396-7e56363c-d79d-11e7-969b-09782f5ccbab.png")
+        
     }
-
-    func testPerformanceExample() throws {
-        // This is an example of a performance test case.
-        measure {
-            // Put the code you want to measure the time of here.
-        }
-    }
-
 }
 class MockUserService: UserService {
     
