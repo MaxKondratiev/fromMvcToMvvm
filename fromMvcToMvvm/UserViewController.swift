@@ -7,7 +7,13 @@
 
 import UIKit
 
+protocol UserViewModelOutput: AnyObject {
+    func updateView(imageUrl: String, email: String)
+}
+
 class UserViewModel {
+    
+    weak var output: UserViewModelOutput?
     
     private let userService: UserService
     
@@ -17,18 +23,23 @@ class UserViewModel {
     }
     
     func fetchUser() {
-        userService.fetchUser { (result) in
+        userService.fetchUser { [weak self] (result) in
             switch result {
             
             case .success(let user):
+                self?.output?.updateView(imageUrl: user.avatar, email: user.email)
+                
                 
             case .failure(_):
+                let errorImageUrl =  "https://user-images.githubusercontent.com/24848110/33519396-7e56363c-d79d-11e7-969b-09782f5ccbab.png"
+                self?.output?.updateView(imageUrl: errorImageUrl, email: "no user found ")
                 
             }
         }
     }
     
 }
+
 
 class UserViewController: UIViewController {
 
@@ -105,13 +116,19 @@ class UserViewController: UIViewController {
 //        }
 //      }
     }
+}
+
 
 
 protocol UserService  {
     func fetchUser(completion: @escaping (Result<User, Error>) -> Void)
 }
 
+
+
 class APIManager : UserService {
+    
+    
     
       //static let shared = APIManager()
       //private init() {}
